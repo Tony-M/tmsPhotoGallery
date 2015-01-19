@@ -19,7 +19,7 @@
                 <?php endif;?>
                 <?php if ($path != '/'): ?>
                     <li class="active">
-                        <a href="?path=<?php echo tmsPhotoManager::encode($path);?>"><?php echo $manager->getCurrentDirNAme() ?>
+                        <a href="?path=<?php echo tmsPhotoManager::encode($path);?>"><?php echo tmsPhotoManager::getCurrentDirNAme() ?>
                             <span class="glyphicon glyphicon-chevron-right" aria-hidden="true" style="float: right; font-size: 12px;"></span>
                         </a>
                     </li>
@@ -27,13 +27,13 @@
                 <?php endif;?>
 
                 <?php if ($path != '/'): ?>
-                    <li><a href="?path=<?php echo tmsPhotoManager::encode($manager->getLevelUpPath())  ?>">../</a></li>
+                    <li><a href="?path=<?php echo tmsPhotoManager::encode(tmsPhotoManager::getLevelUpPath())  ?>">../</a></li>
 
 
                 <?php endif ?>
 
 
-                <?php $dirs = $manager->getDirList(); ?>
+                <?php $dirs = tmsPhotoManager::getDirList(); ?>
                 <?php if (is_array($dirs)): ?>
                     <?php foreach ($dirs as $dir): ?>
                         <?php if (!isset($dir['current']))   : ?>

@@ -14,20 +14,20 @@ class tmsPhotoManager
      * path to root folder of gallery
      * @var string
      */
-    protected $ROOT_PATH = '/';
+    protected static $ROOT_PATH = '/';
 
     /**
      * current path
      * @var string
      */
-    protected $PATH = '';
+    protected static $PATH = '';
 
-    protected $DIRS = array();
-    protected $FILES = array();
+    protected static $DIRS = array();
+    protected static $FILES = array();
 
-    protected $CURRENT_DIR = '';
+    protected static $CURRENT_DIR = '';
 
-    protected $thumbs = '.thmb';
+    protected static $thumbs = '.thmb';
 
     protected static $exts = array('.jpg', '.jpeg', '.gif', '.png');
 
@@ -36,14 +36,14 @@ class tmsPhotoManager
      * @param $path string
      * @return bool
      */
-    public function setRootPath($path = '')
+    public static function setRootPath($path = '')
     {
         $path = trim($path);
         $path = preg_replace('/([\/]{2,})/', '/', $path);
         if (!preg_match('/([\/]{1})$/', $path)) $path .= '/';
 
         if ($path != '' && file_exists($path) && is_dir($path)) {
-            $this->ROOT_PATH = $path;
+            self::$ROOT_PATH = $path;
             return true;
         } else {
             return false;
@@ -55,18 +55,18 @@ class tmsPhotoManager
      * @param string $path
      * @return bool
      */
-    public function setPath($path = '')
+    public static function setPath($path = '')
     {
         $path = trim($path);
         $path = preg_replace('/^([\/]{1,})/', '', $path);
         $path = preg_replace('/([\.]{2,})/', '', $path);
-        $tmp_path = $this->ROOT_PATH . $path;
+        $tmp_path = self::$ROOT_PATH . $path;
         if ($path == '') {
-            $this->PATH = '';
+            self::$PATH = '';
             return true;
         }
         if (file_exists($tmp_path) && is_dir($tmp_path)) {
-            $this->PATH = $path;
+            self::$PATH = $path;
             return true;
         } else {
             return false;
@@ -78,23 +78,23 @@ class tmsPhotoManager
      * return path
      * @return string
      */
-    public function getPath()
+    public static function getPath()
     {
-        return $this->ROOT_PATH . $this->PATH;
+        return self::$ROOT_PATH . self::$PATH;
     }
 
-    public function scanPath()
+    public static function scanPath()
     {
-        $this->CURRENT_DIR_NAME == '/';
-        if ($this->PATH != '/') {
-            $p = explode('/', $this->PATH);
+        self::$CURRENT_DIR == '/';
+        if (self::$PATH != '/') {
+            $p = explode('/', self::$PATH);
             if (is_array($p)) {
-                $this->CURRENT_DIR = $p[count($p) - 1];
+                self::$CURRENT_DIR = $p[count($p) - 1];
             }
         }
 
 
-        $path = $this->getPath();
+        $path = self::getPath();
         $cmd = 'ls -lahgG --time-style=full-iso ' . $path;
 //        echo $cmd;
         exec($cmd, $out);
@@ -108,15 +108,15 @@ class tmsPhotoManager
                     $tmp['date'] = $matches[7];
                     $tmp['name'] = $matches[9];
                     $tmp['path'] = $path . $tmp['name'];
-                    $tmp['path_local'] = '/' . ($this->PATH != '' ? $this->PATH . '/' : '') . $tmp['name'];
+                    $tmp['path_local'] = '/' . (self::$PATH != '' ? self::$PATH . '/' : '') . $tmp['name'];
 
 
                     if (in_array($tmp['name'], array('.', '..'))) continue;
 
                     if ($tmp['type'] == 'd') {
-                        $this->DIRS[] = $tmp;
+                        self::$DIRS[] = $tmp;
                     } else {
-                        $this->FILES[] = $tmp;
+                        self::$FILES[] = $tmp;
                     }
                 }
             }
@@ -125,24 +125,24 @@ class tmsPhotoManager
 
 //        echo '<pre>';
 //        print_r($out);
-//        print_r($this->DIRS);
+//        print_r(self::$DIRS);
 //        echo '</pre>';
     }
 
 
-    public function getDirList()
+    public static function getDirList()
     {
-        return $this->DIRS;
+        return self::$DIRS;
     }
 
-    public function getCurrentDirNAme()
+    public static function getCurrentDirNAme()
     {
-        return $this->CURRENT_DIR;
+        return self::$CURRENT_DIR;
     }
 
-    public function getLevelUpPath()
+    public static function getLevelUpPath()
     {
-        $path = $this->PATH;
+        $path = self::$PATH;
         $path = explode('/', $path);
         if (is_array($path) && count($path > 1)) {
             unset($path[count($path) - 1]);

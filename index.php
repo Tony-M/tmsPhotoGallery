@@ -30,7 +30,14 @@ switch ($act){
         require_once 'tpls/indexSuccess.php';
         break;
     case 'im':
+        $file = (isset($_POST['file'])?$_POST['file']:(isset($_GET['file'])?$_GET['file']:'/'));
         tmsPhotoManager::getThumb($file);
+        exit;
+        break;
+    case 'src':
+        $file = (isset($_POST['file'])?$_POST['file']:(isset($_GET['file'])?$_GET['file']:'/'));
+        tmsPhotoManager::getImage($file);
+        exit;
         break;
 }
 

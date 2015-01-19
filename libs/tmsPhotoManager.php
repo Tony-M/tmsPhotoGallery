@@ -29,7 +29,7 @@ class tmsPhotoManager
 
     protected static $thumbs = '.thmb';
 
-    protected static $exts = array('.jpg', '.jpeg', '.gif', '.png');
+    protected static $exts = array('jpg', 'jpeg', 'gif', 'png');
 
     /**
      * set path to root folder
@@ -93,25 +93,29 @@ class tmsPhotoManager
             }
         }
 
-
+//        echo '<pre>';
         $path = self::getPath();
+//        print_r($path);
         $cmd = 'ls -lahgG --time-style=full-iso ' . $path;
 //        echo $cmd;
         exec($cmd, $out);
+//        print_r($out);
         if (is_array($out)) {
             foreach ($out as $row) {
-                if (preg_match('/^([a-z\-]{1})([a-z\-]{9})( [0-9\-]{1,})([ ]{1,})([0-9a-zA-Z\-]{1,})( )([0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}\:[0-9]{2}\:[0-9]{2})(.{17})(.{1,})$/', $row, $matches)) {
+               $row=trim($row);
+//                echo '|'.$row.'|'.'<br/>';
+                if (preg_match('/^([a-z\-]{1})([a-z\-]{9})([ ]{1,})([0-9\-]{1,})([ ]{1,})([0-9a-zA-Z\-]{1,})([ ]{1,})([0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}\:[0-9]{2}\:[0-9]{2})(.{16})([ ]{1,})(.{1,})$/', $row, $matches)) {
                     $tmp = array();
                     $tmp['type'] = $matches[1];
-                    $tmp['size'] = $matches[5];
+                    $tmp['size'] = $matches[6];
                     $tmp['mode'] = $matches[2];
-                    $tmp['date'] = $matches[7];
-                    $tmp['name'] = $matches[9];
+                    $tmp['date'] = $matches[8];
+                    $tmp['name'] = $matches[11];
                     $tmp['path'] = $path . $tmp['name'];
                     $tmp['path_local'] = '/' . (self::$PATH != '' ? self::$PATH . '/' : '') . $tmp['name'];
-
-
-                    if (in_array($tmp['name'], array('.', '..'))) continue;
+//echo '<br>';
+//print_r($tmp);
+                    if (in_array($tmp['name'], array('.', '..', '.thumb'))) continue;
 
                     if ($tmp['type'] == 'd') {
                         self::$DIRS[] = $tmp;
@@ -123,9 +127,9 @@ class tmsPhotoManager
 
         }
 
-//        echo '<pre>';
+
 //        print_r($out);
-//        print_r(self::$DIRS);
+//        print_r(self::$FILES);
 //        echo '</pre>';
     }
 
@@ -133,6 +137,12 @@ class tmsPhotoManager
     public static function getDirList()
     {
         return self::$DIRS;
+    }
+
+
+    public static function getFileList()
+    {
+        return self::$FILES;
     }
 
     public static function getCurrentDirNAme()
@@ -166,41 +176,94 @@ class tmsPhotoManager
     public static function getThumb($file = '')
     {
         $file = trim($file);
+        $file = preg_replace('/([\.]{2,})/', '', $file);
+        $file = preg_replace('/([\/]{2,})/', '', $file);
+        $file = preg_replace('/^([\/]{1,})/', '', $file);
+
+        $file = self::$ROOT_PATH . $file;
         if (file_exists($file) && is_file($file)) {
-            $ext = pathinfo($file, PATHINFO_EXTENSION);
+            $ext = pathinfo(strtolower($file), PATHINFO_EXTENSION);
 
             if (!in_array($ext, self::$exts)) {
+                echo 1;
                 return false;
             }
         } else {
+            echo 2;
             return false;
         }
 
-        $maxWidth = 100;
-        $maxHeight = 100;
-        $image = file_get_contents($file);
-        if ($image) {
-            $im = new Imagick();
-            $im->readImageBlob($image);
-            $im->setImageFormat("png24");
-            $geo = $im->getImageGeometry();
-            //print_r($geo);
-            $width = $geo['width'];
-            $height = $geo['height'];
-            if ($width > $height) {
-                $scale = ($width > $maxWidth) ? $maxWidth / $width : 1;
-            } else {
-                $scale = ($height > $maxHeight) ? $maxHeight / $height : 1;
+        $filemtime = '';//filemtime($file);
+        $hash = md5($file . $filemtime);
+
+        $dir = dirname($file) . '/' . '.thumb';
+        if (!file_exists($dir) || !is_dir($dir)) {
+            if (!mkdir($dir, 0777)) {
             }
-            $newWidth = $scale * $width;
-            $newHeight = $scale * $height;
-            $im->setImageCompressionQuality(85);
-            $im->resizeImage($newWidth, $newHeight, Imagick::FILTER_LANCZOS, 1.1);
+            chmod($dir, 0777);
+        }
+        $thumb_file = $dir . '/' . $hash . '.png';
+//        echo $thumb_file;exit;
+        if (!file_exists($thumb_file) || !is_file($thumb_file)) {
+
+
+            $maxWidth = 100;
+            $maxHeight = 100;
+            $image = file_get_contents($file);
+            if ($image) {
+                $im = new Imagick();
+                $im->readImageBlob($image);
+                $im->setImageFormat("png24");
+                $geo = $im->getImageGeometry();
+                //print_r($geo);
+                $width = $geo['width'];
+                $height = $geo['height'];
+                if ($width > $height) {
+                    $scale = ($width > $maxWidth) ? $maxWidth / $width : 1;
+                } else {
+                    $scale = ($height > $maxHeight) ? $maxHeight / $height : 1;
+                }
+                $newWidth = $scale * $width;
+                $newHeight = $scale * $height;
+                $im->setImageCompressionQuality(85);
+                $im->resizeImage($newWidth, $newHeight, Imagick::FILTER_LANCZOS, 1.1);
+                header("Content-type: image/png");
+                file_put_contents($thumb_file, $im);
+                echo $im;
+                $im->clear();
+                $im->destroy();
+            }
+        } else {
+            $im = file_get_contents($thumb_file);
             header("Content-type: image/png");
             echo $im;
-            $im->clear();
-            $im->destroy();
         }
+    }
+
+    public static function getImage($file = '')
+    {
+        $file = trim($file);
+        $file = preg_replace('/([\.]{2,})/', '', $file);
+        $file = preg_replace('/([\/]{2,})/', '', $file);
+        $file = preg_replace('/^([\/]{1,})/', '', $file);
+
+        $file = self::$ROOT_PATH . $file;
+        if (file_exists($file) && is_file($file)) {
+            $ext = pathinfo(strtolower($file), PATHINFO_EXTENSION);
+
+            if (!in_array($ext, self::$exts)) {
+                echo 1;
+                return false;
+            }
+        } else {
+            echo 2;
+            return false;
+        }
+
+
+        $im = file_get_contents($file);
+        header("Content-type: image/".$ext);
+        echo $im;
     }
 
 }

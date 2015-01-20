@@ -12,26 +12,33 @@
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/jquery.blueimp-gallery.min.js"></script>
     <script src="/js/bootstrap-image-gallery.min.js"></script>
+    <script src="/js/tmsPhotoManager.js"></script>
 </head>
 <body>
+<input type="hidden" value="/<?php echo tmsPhotoManager::getLocalPath();?>" id="path">
 <?php $files = tmsPhotoManager::getFileList(); ?>
 <div id="wrapper">
     <nav class="navbar-default navbar-static-side tmsNavbar" role="navigation">
         <div class="tmsSidebar">
             <ul class="nav" id="side-menu">
-                <?php if ($path == '/'): ?>
-                    <li class="active"><a href="?path=/">/</a></li>
-                <?php endif; ?>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <?php if ($path == '/'): ?>
+                            <li class="active"><a href="?path=/">/</a></li>
+                        <?php endif; ?>
+                        <?php if ($path != '/'): ?>
+                            <li class="active">
+                                <a href="?path=<?php echo tmsPhotoManager::encode($path); ?>"><?php echo tmsPhotoManager::getCurrentDirNAme() ?>
+                                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"
+                                          style="float: right; font-size: 12px;"></span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                    </div>
+                </div>
                 <?php if ($path != '/'): ?>
-                    <li class="active">
-                        <a href="?path=<?php echo tmsPhotoManager::encode($path); ?>"><?php echo tmsPhotoManager::getCurrentDirNAme() ?>
-                            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"
-                                  style="float: right; font-size: 12px;"></span>
-                        </a>
-                    </li>
                     <li><a href="?path=/">/</a></li>
                 <?php endif; ?>
-
                 <?php if ($path != '/'): ?>
                     <li><a href="?path=<?php echo tmsPhotoManager::encode(tmsPhotoManager::getLevelUpPath()) ?>">../</a>
                     </li>
@@ -45,7 +52,7 @@
                     <?php foreach ($dirs as $dir): ?>
                         <?php if (!isset($dir['current']))   : ?>
                             <li>
-                                <a href="?path=<?php echo tmsPhotoManager::encode($dir['path_local']); ?>"><?php echo $dir['name']; ?></a>
+                                <a href="?path=<?php echo tmsPhotoManager::encode($dir['path_local']); ?>"><span class="glyphicon glyphicon-folder-open" aria-hidden="true" style="margin-right: 8px"></span> <?php echo $dir['name']; ?></a>
                             </li>
                         <?php endif; ?>
                     <?php endforeach; ?>
@@ -57,9 +64,9 @@
         </div>
     </nav>
 
-    <div class="container-fluid" style="left: 220px; position: relative">
-        <div class="row">
-            <div class="col-xs-12">
+    <div class="container-fluid" style="width:100%; padding-left: 230px;">
+        <div class="row" style="margin-left: -15px;">
+            <div class="col-xs-12" style="padding-left: 0px; padding-right: 0px;">
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -108,6 +115,11 @@
     <a class="next">›</a>
     <a class="close">×</a>
     <a class="play-pause"></a>
+    <div class="tmsActions" style="">
+        <a class="btn btn-default" onclick="tmsPhotoManager.rotateCW();return false;"><span class="glyphicon glyphicon-share-alt" aria-hidden="true" style="-moz-transform: scale(-1, 1);-webkit-transform: scale(-1, 1);-o-transform: scale(-1, 1);-ms-transform: scale(-1, 1);transform: scale(-1, 1);"></span></a>
+        <a class="btn btn-default" onclick="tmsPhotoManager.rotateCCW();return false;"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span></a>
+        <a class="btn btn-default" onclick="tmsPhotoManager.remove();return false;" style="margin-top: 20px;"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
+    </div>
     <ol class="indicator"></ol>
     <!-- The modal dialog, which will be used to wrap the lightbox content -->
     <div class="modal fade">

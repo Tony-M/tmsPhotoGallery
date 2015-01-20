@@ -77,13 +77,17 @@ class tmsPhotoManager
     }
 
     /**
-     * return path
+     * return absolute path
      * @return string
      */
     public static function getPath()
     {
         return self::$ROOT_PATH . self::$PATH;
     }
+    public static function getLocalPath()
+{
+    return self::$PATH;
+}
 
     public static function scanPath()
     {

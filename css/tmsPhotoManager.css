@@ -1,6 +1,7 @@
 body{
     background: #202020;
     background-image: url(/images/noise.png);
+width: 100%; height: 100%
 }
 .panel {background: none; border-radius: 0px; border: none}
 .panel-default  .panel-heading{

@@ -31,6 +31,8 @@ class tmsPhotoManager
 
     protected static $exts = array('jpg', 'jpeg', 'gif', 'png');
 
+    protected static $ignore_folders = array();
+
     /**
      * set path to root folder
      * @param $path string
@@ -115,7 +117,12 @@ class tmsPhotoManager
                     $tmp['path_local'] = '/' . (self::$PATH != '' ? self::$PATH . '/' : '') . $tmp['name'];
 //echo '<br>';
 //print_r($tmp);
-                    if (in_array($tmp['name'], array('.', '..', '.thumb'))) continue;
+                    $ignored_folders = self::$ignore_folders;
+                    $ignored_folders[] = '.';
+                    $ignored_folders[] = '..';
+                    $ignored_folders[] = '.thumb';
+
+                    if (in_array($tmp['name'], $ignored_folders)) continue;
 
                     if ($tmp['type'] == 'd') {
                         self::$DIRS[] = $tmp;
@@ -148,6 +155,13 @@ class tmsPhotoManager
     public static function getCurrentDirNAme()
     {
         return self::$CURRENT_DIR;
+    }
+
+    public static function setIgnoreFolderName($folder_name=''){
+        $folder_name = trim($folder_name);
+        if(!preg_match('/[<>\/]{1,}/',$folder_name) && !in_array($folder_name, self::$ignore_folders)){
+            array_push(self::$ignore_folders, $folder_name);
+        }
     }
 
     public static function getLevelUpPath()

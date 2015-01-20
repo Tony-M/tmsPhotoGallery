@@ -3,6 +3,7 @@
 <head>
     <!-- Meta, title, CSS, favicons, etc. -->
     <meta charset="utf-8">
+    <title><?php echo $tmsConf['title']; ?></title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/blueimp-gallery.min.css">
     <link rel="stylesheet" href="/css/bootstrap-image-gallery.min.css">
@@ -13,7 +14,7 @@
     <script src="/js/bootstrap-image-gallery.min.js"></script>
 </head>
 <body>
-
+<?php $files = tmsPhotoManager::getFileList(); ?>
 <div id="wrapper">
     <nav class="navbar-default navbar-static-side tmsNavbar" role="navigation">
         <div class="tmsSidebar">
@@ -60,17 +61,36 @@
         <div class="row">
             <div class="col-xs-12">
 
-                <?php $files = tmsPhotoManager::getFileList(); ?>
-                <?php if (is_array($files)): ?>
-                    <div id="links">
-
-                        <?php foreach ($files as $file): ?>
-                            <a href="?act=src&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?>" title="Banana" data-gallery>
-                                <img src="?act=im&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?>"/>
-                            </a>
-                        <?php endforeach; ?>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Альбом:
+                        <?php if ($path == '/'): ?>
+                            <a href="?path=/">/</a>
+                        <?php endif; ?>
+                        <?php if ($path != '/'): ?>
+                            <a href="?path=<?php echo tmsPhotoManager::encode($path); ?>"><?php echo tmsPhotoManager::getCurrentDirNAme() ?></a>
+                        <?php endif; ?>
+                        <small class="text-muted" style="float: right;">
+                            Папок: <?php echo count($dirs); ?> шт.
+                            Файлов:  <?php echo count($files); ?> шт.
+                        </small>
                     </div>
-                <?php endif; ?>
+                    <div class="panel-body">
+
+                        <?php if (is_array($files)): ?>
+                            <div id="links">
+
+                                <?php foreach ($files as $file): ?>
+                                    <a href="?act=src&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?>"
+                                       title="<?php echo $file['name']; ?>" data-gallery>
+                                        <img
+                                            src="?act=im&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?>"/>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
 
 
             </div>

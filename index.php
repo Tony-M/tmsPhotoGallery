@@ -59,6 +59,27 @@ try {
             tmsPhotoManager::getImage($file);
             exit;
             break;
+        case 'rotate':
+            header("Content-type: application/json; charset=utf-8");
+            $result = array();
+            $result['success'] = false;
+            $file = (isset($_POST['file']) ? $_POST['file'] : (isset($_GET['file']) ? $_GET['file'] : '/'));
+            $direction = (isset($_POST['direction']) ? $_POST['direction'] : (isset($_GET['direction']) ? $_GET['direction'] : ''));
+
+            $result['success']=tmsPhotoManager::rotate($file,$direction);
+            echo json_encode($result);
+            exit;
+            break;
+        case 'rmimg':
+            header("Content-type: application/json; charset=utf-8");
+            $result = array();
+            $result['success'] = false;
+            $file = (isset($_POST['file']) ? $_POST['file'] : (isset($_GET['file']) ? $_GET['file'] : '/'));
+
+            $result['success']=tmsPhotoManager::rmimg($file);
+            echo json_encode($result);
+            exit;
+            break;
     }
 
 

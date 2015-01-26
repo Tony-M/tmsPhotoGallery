@@ -84,10 +84,11 @@ class tmsPhotoManager
     {
         return self::$ROOT_PATH . self::$PATH;
     }
+
     public static function getLocalPath()
-{
-    return self::$PATH;
-}
+    {
+        return self::$PATH;
+    }
 
     public static function scanPath()
     {
@@ -108,7 +109,7 @@ class tmsPhotoManager
 //        print_r($out);
         if (is_array($out)) {
             foreach ($out as $row) {
-               $row=trim($row);
+                $row = trim($row);
 //                echo '|'.$row.'|'.'<br/>';
                 if (preg_match('/^([a-z\-]{1})([a-z\-]{9})([ ]{1,})([0-9\-]{1,})([ ]{1,})([0-9a-zA-Z\-]{1,})([ ]{1,})([0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}\:[0-9]{2}\:[0-9]{2})(.{16})([ ]{1,})(.{1,})$/', $row, $matches)) {
                     $tmp = array();
@@ -161,9 +162,10 @@ class tmsPhotoManager
         return self::$CURRENT_DIR;
     }
 
-    public static function setIgnoreFolderName($folder_name=''){
+    public static function setIgnoreFolderName($folder_name = '')
+    {
         $folder_name = trim($folder_name);
-        if(!preg_match('/[<>\/]{1,}/',$folder_name) && !in_array($folder_name, self::$ignore_folders)){
+        if (!preg_match('/[<>\/]{1,}/', $folder_name) && !in_array($folder_name, self::$ignore_folders)) {
             array_push(self::$ignore_folders, $folder_name);
         }
     }
@@ -211,16 +213,17 @@ class tmsPhotoManager
             return false;
         }
 
-        $filemtime = '';//filemtime($file);
-        $hash = md5($file . $filemtime);
-
-        $dir = dirname($file) . '/' . '.thumb';
-        if (!file_exists($dir) || !is_dir($dir)) {
-            if (!mkdir($dir, 0777)) {
-            }
-            chmod($dir, 0777);
-        }
-        $thumb_file = $dir . '/' . $hash . '.png';
+//        $filemtime = '';//filemtime($file);
+//        $hash = md5($file . $filemtime);
+//
+//        $dir = dirname($file) . '/' . '.thumb';
+//        if (!file_exists($dir) || !is_dir($dir)) {
+//            if (!mkdir($dir, 0777)) {
+//            }
+//            chmod($dir, 0777);
+//        }
+//        $thumb_file = $dir . '/' . $hash . '.png';
+        $thumb_file = self::getThumbName($file);
 //        echo $thumb_file;exit;
         if (!file_exists($thumb_file) || !is_file($thumb_file)) {
 
@@ -258,6 +261,21 @@ class tmsPhotoManager
         }
     }
 
+    public static function getThumbName($file_path)
+    {
+        $filemtime = '';//filemtime($file);
+        $hash = md5($file_path . $filemtime);
+
+        $dir = dirname($file_path) . '/' . '.thumb';
+        if (!file_exists($dir) || !is_dir($dir)) {
+            if (!mkdir($dir, 0777)) {
+            }
+            chmod($dir, 0777);
+        }
+        $thumb_file = $dir . '/' . $hash . '.png';
+        return $thumb_file;
+    }
+
     public static function getImage($file = '')
     {
         $file = trim($file);
@@ -270,18 +288,94 @@ class tmsPhotoManager
             $ext = pathinfo(strtolower($file), PATHINFO_EXTENSION);
 
             if (!in_array($ext, self::$exts)) {
-                echo 1;
                 return false;
             }
         } else {
-            echo 2;
             return false;
         }
 
 
         $im = file_get_contents($file);
-        header("Content-type: image/".$ext);
+        header("Content-type: image/" . $ext);
         echo $im;
+    }
+
+    public static function rotate($file = '', $direction = 'cw')
+    {
+
+        if (!in_array($direction, array('cw', 'ccw')))
+            return false;
+
+        $file = trim($file);
+        $file = preg_replace('/([\.]{2,})/', '', $file);
+        $file = preg_replace('/([\/]{2,})/', '', $file);
+        $file = preg_replace('/^([\/]{1,})/', '', $file);
+
+        $file = self::$ROOT_PATH . $file;
+        if (file_exists($file) && is_file($file)) {
+            $ext = pathinfo(strtolower($file), PATHINFO_EXTENSION);
+
+            if (!in_array($ext, self::$exts)) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        $thunb_file = self::getThumbName($file);
+
+        if (file_exists($thunb_file) && is_file($thunb_file)) {
+            unlink($thunb_file);
+        }
+
+//        $im = file_get_contents($file);
+        header("Content-type: image/" . $ext);
+        $im = new Imagick();
+        $im->readImage($file);
+        $im->rotateImage(new ImagickPixel(), ($direction == 'cw' ? 90 : -90));
+//        print $im->getImage();
+
+        file_put_contents($file, $im);
+//        echo $im;
+        $im->clear();
+        $im->destroy();
+//        echo $im;
+
+
+        return true;
+
+    }
+
+    public static function rmimg($file = '')
+    {
+
+
+        $file = trim($file);
+        $file = preg_replace('/([\.]{2,})/', '', $file);
+        $file = preg_replace('/([\/]{2,})/', '', $file);
+        $file = preg_replace('/^([\/]{1,})/', '', $file);
+
+        $file = self::$ROOT_PATH . $file;
+        if (file_exists($file) && is_file($file)) {
+            $ext = pathinfo(strtolower($file), PATHINFO_EXTENSION);
+
+            if (!in_array($ext, self::$exts)) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        $thunb_file = self::getThumbName($file);
+
+        if (file_exists($thunb_file) && is_file($thunb_file)) {
+            if (unlink($thunb_file)) {
+                if (unlink($file)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

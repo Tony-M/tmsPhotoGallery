@@ -90,8 +90,8 @@
                                 <?php foreach ($files as $file): ?>
                                     <a href="?act=src&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?>"
                                        title="<?php echo $file['name']; ?>" data-gallery>
-                                        <img
-                                            src="?act=im&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?>"/>
+                                        <img class="tmsThumb"
+                                            src="?act=im&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?>" title="<?php echo $file['name']; ?>"/>
                                     </a>
                                 <?php endforeach; ?>
                             </div>
@@ -116,8 +116,8 @@
     <a class="close">×</a>
     <a class="play-pause"></a>
     <div class="tmsActions" style="">
-        <a class="btn btn-default" onclick="tmsPhotoManager.rotateCW();return false;"><span class="glyphicon glyphicon-share-alt" aria-hidden="true" style="-moz-transform: scale(-1, 1);-webkit-transform: scale(-1, 1);-o-transform: scale(-1, 1);-ms-transform: scale(-1, 1);transform: scale(-1, 1);"></span></a>
-        <a class="btn btn-default" onclick="tmsPhotoManager.rotateCCW();return false;"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span></a>
+        <a class="btn btn-default" onclick="tmsPhotoManager.rotateCCW();return false;"><span class="glyphicon glyphicon-share-alt" aria-hidden="true" style="-moz-transform: scale(-1, 1);-webkit-transform: scale(-1, 1);-o-transform: scale(-1, 1);-ms-transform: scale(-1, 1);transform: scale(-1, 1);"></span></a>
+        <a class="btn btn-default" onclick="tmsPhotoManager.rotateCW();return false;"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span></a>
         <a class="btn btn-default" onclick="tmsPhotoManager.remove();return false;" style="margin-top: 20px;"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
     </div>
     <ol class="indicator"></ol>

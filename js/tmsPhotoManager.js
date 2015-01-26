@@ -37,10 +37,19 @@ tmsPhotoManager = {
                         }
 
                     }
-                    if(!n || n==1){
+                    if (!n || n == 1) {
                         $('#blueimp-gallery > a.close:first').click();
-                    }else{
-                        $('#blueimp-gallery > a.next:first').click();
+                    } else {
+                        if ($('a.next:first').css('display') != 'none')
+                            $('#blueimp-gallery > a.next:first').click();
+                        else {
+                            if ($('a.prev:first').css('display') != 'none') {
+                                $('#blueimp-gallery > a.prev:first').click();
+                            } else {
+                                $('#blueimp-gallery > a.close:first').click();
+
+                            }
+                        }
 
                     }
 
@@ -51,7 +60,6 @@ tmsPhotoManager = {
             }, complite: function () {
             }
         });
-
 
 
     }

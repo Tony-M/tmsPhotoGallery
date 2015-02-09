@@ -121,4 +121,41 @@ tmsPhotoManager = {
         });
 
     }
+
+    , createThumbnail: function (params) {
+        if (params === undefined || params === null)return false;
+        if (params.id == undefined || params.id === null)return false;
+        if (params.path == undefined || params.path === null)return false;
+
+        data = {};
+        data.file = params.path;
+
+        $.ajax({
+            type: "POST",
+            url: '/?act=mkthumb',
+            data: data,
+            dataType: 'json',
+            async: false,
+            statusCode: {
+                404: function () {
+                    alert("Error [page 404]");
+                }, 500: function () {
+                    alert("Error [page 500]");
+                }
+            }, success: function (response) {
+                if (response.success !== undefined && response.success) {
+
+
+                    var thumb = $('#' + params.id);
+                    var path = '?act=im&file=' + params.path + '&_t=' + Math.random();
+                    thumb.attr('src', path);
+
+                }
+                else {
+
+                }
+            }, complite: function () {
+            }
+        });
+    }
 }

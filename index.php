@@ -51,12 +51,27 @@ try {
             break;
         case 'im':
             $file = (isset($_POST['file']) ? $_POST['file'] : (isset($_GET['file']) ? $_GET['file'] : '/'));
-            tmsPhotoManager::getThumb($file);
+            if(tmsPhotoManager::isThumbExists($file)) {
+                tmsPhotoManager::getThumb($file);
+            }else{
+                tmsPhotoManager::getDefaultThumb($file);
+            }
             exit;
             break;
         case 'src':
             $file = (isset($_POST['file']) ? $_POST['file'] : (isset($_GET['file']) ? $_GET['file'] : '/'));
             tmsPhotoManager::getImage($file);
+            exit;
+            break;
+        case 'mkthumb':
+            header("Content-type: application/json; charset=utf-8");
+            $result = array();
+            $result['success'] = false;
+
+            $file = (isset($_POST['file']) ? $_POST['file'] : (isset($_GET['file']) ? $_GET['file'] : '/'));
+
+            $result['success']=tmsPhotoManager::getThumb($file,true);
+            echo json_encode($result);
             exit;
             break;
         case 'rotate':

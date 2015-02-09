@@ -120,6 +120,7 @@ class tmsPhotoManager
                     $tmp['name'] = $matches[11];
                     $tmp['path'] = $path . $tmp['name'];
                     $tmp['path_local'] = '/' . (self::$PATH != '' ? self::$PATH . '/' : '') . $tmp['name'];
+                    $tmp['thumb_exist'] = self::isThumbExists($tmp['path_local']);
 //echo '<br>';
 //print_r($tmp);
                     $ignored_folders = self::$ignore_folders;
@@ -193,7 +194,44 @@ class tmsPhotoManager
         return $text;
     }
 
-    public static function getThumb($file = '')
+    /**
+     * check is thumb exist or not
+     * @param string $file
+     * @return bool
+     */
+    public static function isThumbExists($file = '')
+    {
+        $file = trim($file);
+        $file = preg_replace('/([\.]{2,})/', '', $file);
+        $file = preg_replace('/([\/]{2,})/', '', $file);
+        $file = preg_replace('/^([\/]{1,})/', '', $file);
+
+        $file = self::$ROOT_PATH . $file;
+
+        if (file_exists($file) && is_file($file)) {
+            $ext = pathinfo(strtolower($file), PATHINFO_EXTENSION);
+
+            if (!in_array($ext, self::$exts)) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        $thumb_file = self::getThumbName($file);
+        if (!file_exists($thumb_file) || !is_file($thumb_file)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * @param string $file
+     * @param bool $no_data Указывает на то что нужно вернуть картинку или только  булеан результат ее присутствия
+     * @return bool
+     */
+    public static function getThumb($file = '', $no_data = false)
     {
         $file = trim($file);
         $file = preg_replace('/([\.]{2,})/', '', $file);
@@ -205,11 +243,9 @@ class tmsPhotoManager
             $ext = pathinfo(strtolower($file), PATHINFO_EXTENSION);
 
             if (!in_array($ext, self::$exts)) {
-                echo 1;
                 return false;
             }
         } else {
-            echo 2;
             return false;
         }
 
@@ -228,8 +264,8 @@ class tmsPhotoManager
         if (!file_exists($thumb_file) || !is_file($thumb_file)) {
 
 
-            $maxWidth = 100;
-            $maxHeight = 100;
+            $maxWidth = 128;
+            $maxHeight = 128;
             $image = file_get_contents($file);
             if ($image) {
                 $im = new Imagick();
@@ -250,15 +286,24 @@ class tmsPhotoManager
                 $im->resizeImage($newWidth, $newHeight, Imagick::FILTER_LANCZOS, 1.1);
                 header("Content-type: image/png");
                 file_put_contents($thumb_file, $im);
-                echo $im;
+                if (!$no_data) {
+                    echo $im;
+                } else {
+                    return true;
+                }
                 $im->clear();
                 $im->destroy();
             }
         } else {
-            $im = file_get_contents($thumb_file);
-            header("Content-type: image/png");
-            echo $im;
+            if(!$no_data) {
+                $im = file_get_contents($thumb_file);
+                header("Content-type: image/png");
+                echo $im;
+            }else{
+                return true;
+            }
         }
+        return false;
     }
 
     public static function getThumbName($file_path)
@@ -296,6 +341,14 @@ class tmsPhotoManager
 
 
         $im = file_get_contents($file);
+        header("Content-type: image/" . $ext);
+        echo $im;
+    }
+
+    public  static function getDefaultThumb($file=''){
+        $default_thumb = 'images/image.png';
+        $ext = pathinfo(strtolower($default_thumb), PATHINFO_EXTENSION);
+        $im = file_get_contents($default_thumb);
         header("Content-type: image/" . $ext);
         echo $im;
     }

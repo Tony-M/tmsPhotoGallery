@@ -15,8 +15,24 @@
     <script src="/js/tmsPhotoManager.js"></script>
 </head>
 <body>
-<input type="hidden" value="/<?php echo tmsPhotoManager::getLocalPath();?>" id="path">
+<input type="hidden" value="/<?php echo tmsPhotoManager::getLocalPath(); ?>" id="path">
 <?php $files = tmsPhotoManager::getFileList(); ?>
+<script>
+    var no_thumbs = [];
+
+    <?php if(is_array($files) && count($files)):?><?php foreach($files as $file):?><?php if(!$file['thumb_exist']):?>no_thumbs.push({id: 'tmsThumb_<?php echo md5($file['path_local']);?>', path:"<?php echo tmsPhotoManager::encode($file['path_local']);?>"});
+    <?php endif;?><?php endforeach;?><?php endif;?>
+    $( document ).ready(function() {
+        var noT_n = no_thumbs.length;
+        if(noT_n){
+            for(var i =0;i<noT_n;i++){
+                tmsPhotoManager.createThumbnail(no_thumbs[i]);
+            }
+        }
+    });
+
+</script>
+
 <div id="wrapper">
     <nav class="navbar-default navbar-static-side tmsNavbar" role="navigation">
         <div class="tmsSidebar">
@@ -52,7 +68,9 @@
                     <?php foreach ($dirs as $dir): ?>
                         <?php if (!isset($dir['current']))   : ?>
                             <li>
-                                <a href="?path=<?php echo tmsPhotoManager::encode($dir['path_local']); ?>"><span class="glyphicon glyphicon-folder-open" aria-hidden="true" style="margin-right: 8px"></span> <?php echo $dir['name']; ?></a>
+                                <a href="?path=<?php echo tmsPhotoManager::encode($dir['path_local']); ?>"><span
+                                        class="glyphicon glyphicon-folder-open" aria-hidden="true"
+                                        style="margin-right: 8px"></span> <?php echo $dir['name']; ?></a>
                             </li>
                         <?php endif; ?>
                     <?php endforeach; ?>
@@ -83,15 +101,17 @@
                         </small>
                     </div>
                     <div class="panel-body">
-
+<!--<pre>--><?php //print_r($files);?><!--</pre>-->
                         <?php if (is_array($files)): ?>
                             <div id="links">
 
                                 <?php foreach ($files as $file): ?>
-                                    <a href="?act=src&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?>"
+                                    <a class="tmsThumb"
+                                       href="?act=src&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?>"
                                        title="<?php echo $file['name']; ?>" data-gallery>
-                                        <img class="tmsThumb"
-                                            src="?act=im&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?>" title="<?php echo $file['name']; ?>"/>
+                                        <img class="tmsThumb" id="tmsThumb_<?php echo md5($file['path_local']);?>"  src="?act=im&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?>" title="<?php echo $file['name']; ?>"/>
+
+                                        <span><?php echo tmsPhotoManager::encode($file['name']); ?></span>
                                     </a>
                                 <?php endforeach; ?>
                             </div>
@@ -115,10 +135,15 @@
     <a class="next">›</a>
     <a class="close">×</a>
     <a class="play-pause"></a>
+
     <div class="tmsActions" style="">
-        <a class="btn btn-default" onclick="tmsPhotoManager.rotateCCW();return false;"><span class="glyphicon glyphicon-share-alt" aria-hidden="true" style="-moz-transform: scale(-1, 1);-webkit-transform: scale(-1, 1);-o-transform: scale(-1, 1);-ms-transform: scale(-1, 1);transform: scale(-1, 1);"></span></a>
-        <a class="btn btn-default" onclick="tmsPhotoManager.rotateCW();return false;"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span></a>
-        <a class="btn btn-default" onclick="tmsPhotoManager.remove();return false;" style="margin-top: 20px;"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
+        <a class="btn btn-default" onclick="tmsPhotoManager.rotateCCW();return false;"><span
+                class="glyphicon glyphicon-share-alt" aria-hidden="true"
+                style="-moz-transform: scale(-1, 1);-webkit-transform: scale(-1, 1);-o-transform: scale(-1, 1);-ms-transform: scale(-1, 1);transform: scale(-1, 1);"></span></a>
+        <a class="btn btn-default" onclick="tmsPhotoManager.rotateCW();return false;"><span
+                class="glyphicon glyphicon-share-alt" aria-hidden="true"></span></a>
+        <a class="btn btn-default" onclick="tmsPhotoManager.remove();return false;" style="margin-top: 20px;"><span
+                class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
     </div>
     <ol class="indicator"></ol>
     <!-- The modal dialog, which will be used to wrap the lightbox content -->

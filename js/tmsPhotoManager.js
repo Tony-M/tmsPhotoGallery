@@ -135,7 +135,6 @@ tmsPhotoManager = {
             url: '/?act=mkthumb',
             data: data,
             dataType: 'json',
-            async: false,
             statusCode: {
                 404: function () {
                     alert("Error [page 404]");
@@ -149,12 +148,14 @@ tmsPhotoManager = {
                     var thumb = $('#' + params.id);
                     var path = '?act=im&file=' + params.path + '&_t=' + Math.random();
                     thumb.attr('src', path);
-
+                    i_not_n++;
+                    tmsPhotoManager.createThumbnail(no_thumbs[i_not_n]);
                 }
                 else {
 
                 }
             }, complite: function () {
+
             }
         });
     }

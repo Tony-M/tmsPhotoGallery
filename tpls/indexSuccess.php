@@ -19,15 +19,19 @@
 <?php $files = tmsPhotoManager::getFileList(); ?>
 <script>
     var no_thumbs = [];
+    var not_n = 0;
+    var i_not_n = 0;
 
-    <?php if(is_array($files) && count($files)):?><?php foreach($files as $file):?><?php if(!$file['thumb_exist']):?>no_thumbs.push({id: 'tmsThumb_<?php echo md5($file['path_local']);?>', path:"<?php echo tmsPhotoManager::encode($file['path_local']);?>"});
+    <?php if(is_array($files) && count($files)):?><?php foreach($files as $file):?><?php if(!$file['thumb_exist']):?>no_thumbs.push({
+        id: 'tmsThumb_<?php echo md5($file['path_local']);?>',
+        path: "<?php echo tmsPhotoManager::encode($file['path_local']);?>"
+    });
     <?php endif;?><?php endforeach;?><?php endif;?>
-    $( document ).ready(function() {
-        var noT_n = no_thumbs.length;
-        if(noT_n){
-            for(var i =0;i<noT_n;i++){
-                tmsPhotoManager.createThumbnail(no_thumbs[i]);
-            }
+
+    $(document).ready(function () {
+        not_n = no_thumbs.length;
+        if (not_n) {
+            tmsPhotoManager.createThumbnail(no_thumbs[i_not_n]);
         }
     });
 
@@ -101,7 +105,7 @@
                         </small>
                     </div>
                     <div class="panel-body">
-<!--<pre>--><?php //print_r($files);?><!--</pre>-->
+                        <!--<pre>--><?php //print_r($files);?><!--</pre>-->
                         <?php if (is_array($files)): ?>
                             <div id="links">
 
@@ -109,7 +113,9 @@
                                     <a class="tmsThumb"
                                        href="?act=src&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?>"
                                        title="<?php echo $file['name']; ?>" data-gallery>
-                                        <img class="tmsThumb" id="tmsThumb_<?php echo md5($file['path_local']);?>"  src="?act=im&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?>" title="<?php echo $file['name']; ?>"/>
+                                        <img class="tmsThumb" id="tmsThumb_<?php echo md5($file['path_local']); ?>"
+                                             src="<?php if (tmsPhotoManager::isThumbExists($file['path_local'])): ?>?act=im&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?><?php else: ?>/images/image.php<?php endif; ?>"
+                                             title="<?php echo $file['name']; ?>"/>
 
                                         <span><?php echo tmsPhotoManager::encode($file['name']); ?></span>
                                     </a>

@@ -1,1 +1,10 @@
 AddCharset UTF-8 .utf8
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    RewriteCond %{QUERY_STRING} ^(act)=(src)&(file)=([^/=&]{1,}\.png)
+    RewriteRule /* /storage/%4? [L]
+    RewriteCond %{QUERY_STRING} ^(act)=(src)&(file)=([/]{1})(.{1,}\.png)
+    RewriteRule /* /storage/%5? [L]
+</IfModule>

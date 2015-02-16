@@ -111,10 +111,10 @@
 
                                 <?php foreach ($files as $file): ?>
                                     <a class="tmsThumb"
-                                       href="?act=src&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?>"
+                                       href="/storage<?php echo $file['path_local'] ?>"
                                        title="<?php echo $file['name']; ?>" data-gallery>
                                         <img class="tmsThumb" id="tmsThumb_<?php echo md5($file['path_local']); ?>"
-                                             src="<?php if (tmsPhotoManager::isThumbExists($file['path_local'])): ?>?act=im&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?><?php else: ?>/images/image.php<?php endif; ?>"
+                                             src="<?php if (tmsPhotoManager::isThumbExists($file['path_local'])): ?>?act=im&file=<?php echo tmsPhotoManager::encode($file['path_local']); ?><?php else: ?>/images/image.png<?php endif; ?>"
                                              title="<?php echo $file['name']; ?>"/>
 
                                         <span><?php echo tmsPhotoManager::encode($file['name']); ?></span>
